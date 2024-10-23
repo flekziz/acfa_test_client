@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../axacfa.props/framework.props" />
+  <Import Project="../../axacfa.props/third.microsoft.props" />
+  <Import Project="../../axacfa.props/region.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="13.*" />
+    <PackageReference Include="Cake.Frosting" Version="3.*" />
+    <PackageReference Include="Cake.Compression" Version="0.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../axacfa.boilerplate/primitives/dto/**/*.cs" Link="" />
+    <Compile Include="../../axacfa.boilerplate/primitives/poco/**/*.cs" Link="" />
+    <Compile Include="../../axacfa.boilerplate/primitives/server.exceptions/**/*.cs" Link="" />
+    <Compile Include="../../axacfa.boilerplate/primitives/consts/**/*.cs" Link="" />
+    <Compile Include="../../axacfa.boilerplate/primitives/extension/**/*.cs" Link="" />
+    <Compile Include="../../axacfa.boilerplate/primitives/error_codes.cs" Link="" />
+    <Compile Include="../../axacfa.boilerplate/common/models/ddi.cs" Link="" />
+    <Compile
+      Include="../../axacfa.server/axacfa.acfa.driver/module/models/options/backport_options.cs"
+      Link="" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="*/*.resx" />
+    <Content Include="*/*.resx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInPackage>true</IncludeInPackage>
+      <BuildAction>Content</BuildAction>
+      <copyToOutput>true</copyToOutput>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup
+    Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(
+     $(DefineConstants), '^(.*;)*REGION_EN(;.*)*$'))">
+    <Content Remove="ru\*.resx" />
+  </ItemGroup>
+</Project>

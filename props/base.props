@@ -1,0 +1,57 @@
+<Project>
+  <Import Project="framework.props" />
+  <PropertyGroup>
+    <RootDir>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\))</RootDir>
+    <ProjectDir>$(MSBuildProjectDirectory.Replace($(RootDir), ''))</ProjectDir>
+    <AxAcfaDir>$([System.IO.Path]::GetDirectoryName($(ProjectDir)))</AxAcfaDir>
+    <OutputPath>$([System.IO.Path]::Combine($(RootDir), '.result', $(Configuration), $(Platform)))</OutputPath>
+    <PackPath>$([System.IO.Path]::Combine($(RootDir), '.pack'))</PackPath>
+    <TestPath>$([System.IO.Path]::Combine($(RootDir), '.test', $(Configuration), $(Platform)))</TestPath>
+    <IsTest>$(MSBuildProjectName.EndsWith('test'))</IsTest>
+    <Version>0.0.0</Version>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyVersion>0.0.0</AssemblyVersion>
+    <Configurations>debug;release</Configurations>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <Platforms>osx-arm64;osx-x64;linux-arm64;linux-x64;win-x64;win-x86;any;intellect-x86;intellect-x64</Platforms>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <OutputPath>$(RootDir)/.result/$(Configuration)/$(Platform)</OutputPath>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'debug' ">
+    <DebugType>portable</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'release' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'any' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'win-x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>$(DefineConstants);WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'win-x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>$(DefineConstants);WIN64</DefineConstants>
+  </PropertyGroup>
+    <PropertyGroup Condition=" '$(Platform)' == 'linux-x64' Or '$(Platform)' == 'osx-x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'linux-arm64' Or '$(Platform)' == 'osx-arm64' ">
+    <PlatformTarget>arm64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'intellect-x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>$(DefineConstants);INTL64;WIN64</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'intellect-x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>$(DefineConstants);INTL32;WIN32</DefineConstants>
+  </PropertyGroup>
+</Project>

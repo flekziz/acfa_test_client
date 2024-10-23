@@ -1,0 +1,10 @@
+<Project>
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">any</Platform>
+        <PackageId>$(MSBuildProjectName)</PackageId>
+        <Nullable>enable</Nullable>
+        <TargetFramework>net8.0</TargetFramework>
+        <AssemblyName>$(AssemblyName)</AssemblyName>
+    </PropertyGroup>
+</Project>

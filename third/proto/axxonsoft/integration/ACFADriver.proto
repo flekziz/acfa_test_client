@@ -1,0 +1,804 @@
+syntax = "proto3";
+package drivers.acfa.v2;
+option go_package = "drivers.acfa.v2";
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+
+message RangeConstraint
+{
+    // Minimum property value.
+    oneof min {
+        int32 min_int = 1;
+        double min_double = 2;
+        int64 min_int64 = 3;
+        uint64 min_uint64 = 4;
+    };
+    // Maximum property value.
+    oneof max {
+        int32 max_int = 10;
+        double max_double = 11;
+        int64 max_int64 = 12;
+        uint64 max_uint64 = 13;
+    };
+
+    // Default property value.
+    oneof default {
+        int32 default_int = 20;
+        double default_double = 21;
+        int64 default_int64 = 22;
+        uint64 default_uint64 = 23;
+    };
+}
+
+message PropertyDescriptorGroup
+{
+    repeated PropertyDescriptor properties = 1;
+}
+
+message EnumerationConstraintsItem
+{
+    // A localization key (user-friendly name) for this value.
+    string name = 1;
+    // Actual item value
+    oneof value {
+        string value_string = 20;
+        int32 value_int32 = 21;
+        double value_double = 22;
+        bool value_bool = 23;
+        int64 value_int64 = 24;
+        uint64 value_uint64 = 25;
+        PropertyDescriptorGroup value_property_group = 26;
+    }
+
+    // A set of properties that characterize a value.
+    repeated PropertyDescriptor traits = 2;
+    // Nested (dependent) properties descriptor.
+    repeated PropertyDescriptor properties = 50;
+}
+
+message EnumerationConstraints
+{
+    // A list of possible values along with properties, active when a particular item value is selected.
+    repeated EnumerationConstraintsItem items = 1;
+
+    oneof default {
+        string default_string = 20;
+        int32 default_int32 = 21;
+        double default_double = 22;
+        bool default_bool = 23;
+        int64 default_int64 = 24;
+        uint64 default_uint64 = 25;
+        PropertyDescriptorGroup value_property_group = 26;
+    }
+}
+
+message PropertyDescriptor
+{
+    reserved 24 to 27, 30 to 39;
+
+    // Property identifier.
+    string id = 1;
+    // Property display name. If this attribute is absent, then id is used instead.
+    string name = 2;
+    // Property description (if any).
+    string description = 5;
+    // Specifies the name of the category in which to group the property when displayed.
+    string category = 8;
+    // Property type: string, int32, double, bool, and so on.
+    string type = 3;
+    // Whether this parameter is read-only.
+    bool readonly = 4;
+    // Auxiliary flag for service use by clients.
+    // Indicates that the client should hide this property from users.
+    bool internal = 6;
+    // Localized (user-friendly) value.
+    // If not empty, should be displayed instead of the actual value.
+    google.protobuf.StringValue display_value = 7;
+
+    oneof value {
+        string value_string = 20;
+        int32 value_int32 = 21;
+        double value_double = 22;
+        bool value_bool = 23;
+        int64 value_int64 = 28;
+        uint64 value_uint64 = 29;
+        PropertyDescriptorGroup value_properties = 49;
+    }
+
+    oneof constraints {
+        RangeConstraint range_constraint = 50;
+        EnumerationConstraints enum_constraint = 51;
+    }
+}
+
+enum EUnitStatus
+{
+    UNIT_STATUS_UNSPECIFIED = 0;
+    UNIT_STATUS_ACTIVE = 1;
+    UNIT_STATUS_INACTIVE = 2;
+}
+
+// Deprecated: use string values instead.
+enum EUnitType
+{
+    ACFAUndefined = 0;
+
+    ACFA = 1; // Required root unit type.
+    ACFAController = 2;
+    ACFALoop = 3;
+    ACFAReader = 4;
+    ACFASensor = 5;
+    ACFARelay = 6;
+    ACFALock = 7;
+    ACFAArea = 8;
+    ACFAGroupArea = 9;
+    ACFAFence = 10;
+}
+
+message ResetOperation
+{
+    string id = 1;
+    string display_name = 2;
+
+    // TODO: think about add repeated google.protobuf.Any args = 3;
+}
+
+message UnitDescriptor
+{
+    // Reserved field numbers and names.
+    reserved 5, 8, 10, 12, 14, 15, 17, 18;
+    reserved "access_point", "factory", "discoverable", "stripped", "assigned_templates";
+    reserved "has_unapplied_templates", "config_name", "config_etag";
+
+    // Unit identifier. Full unique unit identifier.
+    string uid = 1;
+    // Short id, usually unique only within the direct parent context.
+    // Can be paired with type and used in UI as a more user-friendly identifier.
+    string display_id = 2;
+    // Unit type as a string.
+    string type = 3;
+    // Localized version of the 'type'.
+    string localized_type = 20;
+    // User-specified or properly localized name for the unit.
+    string display_name = 4;
+    // Current or initialization params.
+    repeated PropertyDescriptor properties = 6;
+    // A set of properties that characterize the current unit (can't be configured).
+    repeated PropertyDescriptor traits = 16;
+    // A set of operations that are available to perform on the unit configuration.
+    repeated ResetOperation reset_operations = 19;
+    // Initialized sub-units, if any.
+    repeated UnitDescriptor units = 7;
+
+    repeated PropertyDescriptor destruction_args = 9;
+    // Unit activation status.
+    EUnitStatus status = 11;
+    // User-defined params stored in the unit configuration.
+    // Please mind about name conflicts when choosing a param id.
+    // Warning: not all units support such params.
+    repeated PropertyDescriptor opaque_params = 13;
+    // Internal unit type.
+    // The 'type' field is a generic version.
+    // 'internal_type' is narrowly typed.
+    string internal_type = 100;
+    // Localized version of the 'internal_type'.
+    string localized_internal_type = 101;
+}
+
+message Device
+{
+    string vendor = 1;
+    string model = 2;
+    repeated string firmware = 3;
+    bool obsolete = 4;
+}
+
+message UnitType
+{
+    string type = 1;
+    Device device = 2;
+}
+
+message Unit
+{
+    oneof value {
+        string uid = 1;
+        UnitType type = 2;
+    }
+}
+
+// State defines state of unit. state can be active or not, active state is displayed on the map
+message State
+{
+    enum EStateType
+    {
+        ST_NORMAL = 0;
+        ST_WARNING = 1;
+        ST_ALARM = 2;
+        ST_FAILURE = 3;
+    }
+
+    // Empty for default state, which is used when the type of processing is to be defined by default.
+    string id = 1;
+    // Empty for default state, which is used when the type of processing is to be defined by default.
+    string name = 2;
+    // Defines the state processing type, can be 'failure', 'normal', 'warning', 'alarm'.
+    EStateType type = 3;
+}
+
+message Icon
+{
+    string id = 1;
+    string image = 2;
+}
+
+message IconGroup
+{
+    repeated Icon items = 1;
+}
+
+message Line
+{
+    string id = 1;
+
+    string color = 2;
+    string width = 3;
+    string pattern = 4;
+}
+
+message LineGroup
+{
+    repeated Line items = 1;
+}
+
+message Area
+{
+    string id = 1;
+
+    string color = 2;
+    string pattern = 3;
+}
+
+message AreaGroup
+{
+    repeated Area items = 1;
+}
+
+message Text
+{
+    string id = 1;
+}
+
+message TextGroup
+{
+    repeated string items = 1;
+}
+
+// Visualization defines how a unit is displayed on the map.
+message Visualization
+{
+    string id = 1;
+    string name = 2;
+
+    oneof value {
+        IconGroup icons = 10;
+        LineGroup lines = 11;
+        AreaGroup areas = 12;
+        TextGroup texts = 13;
+    }
+}
+
+enum EEventPhase
+{
+    MOMENTARY = 0; // One-phase event, like "access was requested", "user passed the door".
+    BEGAN = 1; // Event changed to active.
+    ENDED = 2; // Event changed to inactive.
+    TECHNICAL = 3; // Momentary event that should not be stored in the database for too long, usually not important events like "device configuration read".
+    PERIODICAL = 4; // Events that are sent very often, like signal level.
+}
+
+
+// Event defines an event that can be sent by a device/unit.
+message Event
+{
+    // Event identifier.
+    string id = 1;
+    // Event display name. If this attribute is absent, then id is used instead.
+    string name = 2;
+    // Parameters of the event that can be sent by the unit, if any.
+    repeated PropertyDescriptor params = 4;
+}
+
+// Action defines an operation that can be performed by a device/unit.
+message Action
+{
+    // Action identifier.
+    string id = 1;
+    string name = 2;
+    // Input parameters of the action.
+    repeated PropertyDescriptor input = 3;
+    // Output parameters of the action.
+    repeated PropertyDescriptor output = 4;
+}
+
+
+enum ELogLevel
+{
+    LL_INFO = 0;    // Information that may be of interest to the user.
+    LL_WARNNG = 1;  // Warning about potential error.
+    LL_DEBUG = 2;   // Debugging info.
+    LL_ERROR = 3;   // Critical error.
+    LL_TRACE = 4;   // Log everything.
+}
+
+// Deprecated: Spelling mistake in the name of the rpc message.
+message InitalizeModuleRequest
+{
+    option deprecated = true;
+
+    string environment_path = 1;
+    ELogLevel log_level = 2;
+    string localization_language = 3;
+}
+
+message InitializeModuleRequest
+{
+    /// Environment path. Can be set if required to load specific third-party modules, like ffmpeg.
+    /// This parameter can be used only for locally run modules.
+    string environment_path = 1;
+    ELogLevel log_level = 2;
+    /// Language used by the driver to report strings displayed by the GUI.
+    string localization_language = 3;
+}
+
+message LogMessage
+{
+    ELogLevel level = 1;
+    string file = 2;
+    uint32 line = 3;
+    string function = 4;
+    string message = 5;
+}
+
+message ModuleEvent
+{
+    // Unit UID.
+    string uid = 1;
+    // Unit display name.
+    string display_name = 10;
+    // UTC time of the event.
+    google.protobuf.Timestamp timestamp = 2;
+    // Current event data.
+    oneof data {
+        // Send any event described in ListUnitsEventsResponse.
+        Event event = 3;
+        // Send event to change the state of the unit. States are described in ListUnitsStatesResponse.
+        State state = 4;
+        // Send event to change the unit status.
+        EUnitStatus status = 5;
+    }
+
+    // See EEventPhase.
+    EEventPhase phase = 6;
+    // Description of the current event, which can include dynamic information about the event in readable form.
+    string description = 7;
+    // Localized event string to display in the client.
+    string localized_string = 8;
+}
+
+
+message ModuleEventPackage
+{
+    repeated ModuleEvent events = 1;
+}
+
+message ModuleMessage
+{
+    oneof value
+    {
+        LogMessage log = 50;
+        ModuleEvent event = 51;
+        ModuleEventPackage event_package = 52;
+    }
+}
+
+message ListDevicesDescriptionRequest
+{
+    repeated Device devices = 1;
+}
+
+message ListDevicesDescriptionResponse
+{
+    repeated UnitDescriptor devices = 1;
+}
+
+message DownloadDataRequest
+{
+    // Usually the file ID is the relative image file name from the image property of visualization.
+    repeated string data_id = 1;
+}
+
+message DownloadDataResponse
+{
+    bytes data = 1;
+    string data_id = 2;
+}
+
+message DownloadConfigurationRequest
+{
+    string uid = 1;
+}
+
+message DownloadConfigurationResponse
+{
+    // If not a root unit, the UID of the parent object, either unit or device.
+    string parent_uid = 1;
+    UnitDescriptor unit = 2;
+}
+
+message CreateDeviceRequest
+{
+    Device device = 1;
+    UnitDescriptor configuration = 2;
+}
+
+message AddUnitsRequest
+{
+    // UID of the parent object, either unit or device.
+    string parent_uid = 1;
+    // Unit settings should include settings that are required for starting the unit.
+    // At least the fields id and guid should be defined.
+    repeated UnitDescriptor units = 2;
+}
+
+message ChangeUnitsRequest
+{
+    message ChangeUnit
+    {
+        string uid = 1;
+        // Properties that need to be changed.
+        repeated PropertyDescriptor properties = 2;
+    }
+
+    repeated ChangeUnit changed = 1;
+}
+
+message RemoveUnitsRequest
+{
+    message RemoveUnit
+    {
+        string uid = 1;
+        // Destruction args for correct removing, if any.
+        repeated PropertyDescriptor destruction_args = 2;
+    }
+
+    repeated RemoveUnit removed = 1;
+}
+
+message ConfigurationChangeResponse
+{
+    repeated string successed = 1;
+    repeated string failed = 2;
+}
+
+message ListUnitsActionsRequest
+{
+    repeated Unit units = 1;
+}
+
+message ListUnitsActionsResponse
+{
+    message UnitAction
+    {
+        string uid = 1;
+        repeated Action actions = 2;
+    }
+
+    repeated UnitAction items = 1;
+}
+
+enum EUnitDisplayMode
+{
+    DM_FULL = 0x000;
+    DM_WITH_PROPERTIES = 0x001; // To get UnitDescriptor with current properties.
+    DM_WITH_SUB_UNITS = 0x004; // To get UnitDescriptor with sub-units.
+}
+
+
+message ListUnitsRequest
+{
+    repeated string unit_uids = 1;
+    int32 display_mode = 3;
+}
+
+message ListUnitsResponse
+{
+    repeated UnitDescriptor units = 1;
+    // Temporarily unavailable objects.
+    repeated string unreachable_objects = 2;
+    // Objects do not exist.
+    repeated string not_found_objects = 3;
+}
+
+message ListUnitsFactoryRequest
+{
+    repeated Unit units = 1;
+}
+
+message ListUnitsFactoryResponse
+{
+    message UnitFactory
+    {
+        string uid = 1;
+        repeated UnitDescriptor factory = 2;
+    }
+
+    repeated UnitFactory items = 1;
+}
+
+message ListUnitsVisualizationsRequest
+{
+    repeated Unit units = 1;
+}
+
+message ListUnitsVisualizationsResponse
+{
+    message UnitVisualizations
+    {
+        string uid = 1;
+        repeated Visualization visualizations = 2;
+    }
+
+    repeated UnitVisualizations items = 1;
+}
+
+message ListUnitsEventsRequest
+{
+    repeated Unit units = 1;
+}
+
+message ListUnitsEventsResponse
+{
+    message UnitEvents
+    {
+        string uid = 1;
+        repeated Event events = 2;
+    }
+
+    repeated UnitEvents items = 1;
+}
+
+message ListUnitsStatesRequest
+{
+    repeated Unit units = 1;
+}
+
+message ListCurrentStatesRequest
+{
+    repeated Unit units = 1;
+}
+
+message ListUnitsStatesResponse
+{
+    message UnitStates
+    {
+        string uid = 1;
+        repeated State states = 2;
+    }
+
+    repeated UnitStates items = 1;
+}
+
+message PerformActionRequest
+{
+    // UID of the object (device or unit UID) that should perform the requested method.
+    string uid = 1;
+    // Action ID.
+    string id = 2;
+    // Action input params, see ActionsListResponse and AcquireSettingsResponse for details.
+    repeated PropertyDescriptor properties = 3;
+}
+
+message PerformActionResponse
+{
+    // Empty if succeeded.
+    string error_message = 1;
+    // Action output params, if any.
+    repeated PropertyDescriptor properties = 2;
+}
+
+message UnitsRequest
+{
+    option deprecated = true;
+    message UnitType
+    {
+        string type = 1;
+        Device device = 2;
+    }
+
+    message Unit
+    {
+        oneof value {
+            string uid = 1;
+            UnitType type = 2;
+        }
+    }
+
+    repeated Unit units = 1;
+}
+
+message UnitTypeInfo
+{
+    string name = 1;
+    string display_name = 2;
+}
+
+message ListUnitTypesRequest
+{
+}
+
+message ListUnitTypesResponse
+{
+    repeated UnitTypeInfo items = 1;
+}
+
+service ACFADriver
+{
+    rpc InitializeModule(InitializeModuleRequest) returns (stream ModuleMessage) {
+        option (google.api.http) = {
+            post: "/v2/driver/init"
+            body: "*"
+        };
+    }
+
+    rpc TerminateModule(google.protobuf.Empty) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get: "/v2/driver/terminate"
+        };
+    }
+
+    rpc ListDevicesDescription(ListDevicesDescriptionRequest) returns (ListDevicesDescriptionResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/devices:description"
+            body: "*"
+        };
+    }
+
+    rpc ListUnits(ListUnitsRequest) returns (ListUnitsResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/list:units"
+            body: "*"
+        };
+    }
+
+
+    rpc ListUnitsFactory2(ListUnitsFactoryRequest) returns (ListUnitsFactoryResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/list:factory"
+            body: "*"
+        };
+    }
+
+    rpc ListUnitsActions2(ListUnitsActionsRequest) returns (ListUnitsActionsResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/list:actions"
+            body: "*"
+        };
+    }
+
+    rpc ListUnitsVisualizations2(ListUnitsVisualizationsRequest) returns (ListUnitsVisualizationsResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/list:visualizations"
+            body: "*"
+        };
+    }
+
+    rpc ListUnitsEvents2(ListUnitsEventsRequest) returns (ListUnitsEventsResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/list:events"
+            body: "*"
+        };
+    }
+
+    rpc ListUnitsStates2(ListUnitsStatesRequest) returns (ListUnitsStatesResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/list:states"
+            body: "*"
+        };
+    }
+
+    rpc ListCurrentStates2(ListCurrentStatesRequest) returns (ListUnitsStatesResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/states"
+            body: "*"
+        };
+    }
+
+    rpc ListUnitTypes(ListUnitTypesRequest) returns (ListUnitTypesResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/list:unit_types"
+            body: "*"
+        };
+    }
+
+    rpc PerformAction(PerformActionRequest) returns (PerformActionResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/perform"
+            body: "*"
+        };
+    }
+
+    rpc DownloadData(DownloadDataRequest) returns (stream DownloadDataResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/download:data"
+            body: "*"
+        };
+    }
+
+    rpc DownloadConfiguration(DownloadConfigurationRequest) returns (stream DownloadConfigurationResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/download:config"
+            body: "*"
+        };
+    }
+
+    rpc CreateDevice(CreateDeviceRequest) returns (ConfigurationChangeResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/device:create"
+            body: "*"
+        };
+    }
+
+    rpc AddUnits(AddUnitsRequest) returns (ConfigurationChangeResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/units:add"
+            body: "*"
+        };
+    }
+
+    rpc ChangeUnits(ChangeUnitsRequest) returns (ConfigurationChangeResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/units:change"
+            body: "*"
+        };
+    }
+
+    rpc RemoveUnits(RemoveUnitsRequest) returns (ConfigurationChangeResponse) {
+        option (google.api.http) = {
+            post: "/v2/driver/units:remove"
+            body: "*"
+        };
+    }
+
+    // Deprecated: Spelling mistake in the name of the rpc method.
+    rpc InitalizeModule(InitalizeModuleRequest) returns (stream ModuleMessage) {
+        option deprecated = true;
+    }
+
+    rpc ListUnitsFactory(UnitsRequest) returns (ListUnitsFactoryResponse) {
+        option deprecated = true;
+    }
+
+    rpc ListUnitsActions(UnitsRequest) returns (ListUnitsActionsResponse) {
+        option deprecated = true;
+    }
+
+    rpc ListUnitsVisualizations(UnitsRequest) returns (ListUnitsVisualizationsResponse) {
+        option deprecated = true;
+    }
+
+    rpc ListUnitsEvents(UnitsRequest) returns (ListUnitsEventsResponse) {
+        option deprecated = true;
+    }
+
+    rpc ListUnitsStates(UnitsRequest) returns (ListUnitsStatesResponse) {
+        option deprecated = true;
+    }
+
+    rpc ListCurrentStates(UnitsRequest) returns (ListUnitsStatesResponse) {
+        option deprecated = true;
+    }
+}
