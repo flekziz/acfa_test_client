@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Protobuf Include="../../third/proto/axxonsoft/integration/ACFADriver.proto" ProtoRoot="../../third/proto" GrpcServices="Client" Access="Public">
+      <Link>Protos\ACFADriver.proto</Link>
+    </Protobuf>
+    <PackageReference Include="Google.Api.Gax" Version="3.7.0" />
+    <PackageReference Include="Google.Api.Gax.Grpc" Version="3.7.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+  </ItemGroup>
+</Project>
