@@ -20,6 +20,9 @@
     <OutputPath>$(RootDir)/.result/$(Configuration)/$(Platform)</OutputPath>
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'debug' ">
     <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
