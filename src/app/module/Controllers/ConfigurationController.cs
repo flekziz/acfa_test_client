@@ -2,6 +2,7 @@
 using src.app.module.Models;
 using src.app.module.Repositories;
 using AutoMapper;
+using System.Collections.Generic;
 
 namespace src.app.module.Controllers
 {
@@ -16,6 +17,14 @@ namespace src.app.module.Controllers
         {
             _configurationRepository = configurationRepository;
             _mapper = mapper;
+        }
+
+        [HttpGet]
+        public ActionResult<IEnumerable<OutputConfigurationModel>> GetAllConfigurations()
+        {
+            var configurations = _configurationRepository.GetAllConfigurations();
+            var outputModels = _mapper.Map<IEnumerable<OutputConfigurationModel>>(configurations);
+            return Ok(outputModels);
         }
 
         [HttpGet("{uid}")]

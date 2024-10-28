@@ -1,4 +1,5 @@
-﻿using src.app.module.Models;
+﻿using System.Collections.Generic;
+using src.app.module.Models;
 
 namespace src.app.module.Repositories
 {
@@ -7,5 +8,6 @@ namespace src.app.module.Repositories
     {
         DbConfigurationModel GetConfiguration(string uid);
         void SaveConfiguration(DbConfigurationModel configuration);
+        IEnumerable<DbConfigurationModel> GetAllConfigurations();
     }
 }

@@ -1,14 +1,18 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using src.app.module.Repositories;
+using AutoMapper;
+using src.app.module.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddSingleton<IConfigurationRepository, InMemoryConfigurationRepository>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 var app = builder.Build();
 
-app.MapGet("/api/configurations/{uid}", () => "Hello World!");
-app.MapPost("/api/configurations/{uid}", () => "Hello World!");
-
-app.MapGet("/api/configurations/{uid}/events", () => "Hello World!");
-
-app.Run();
+app.MapControllers();
+app.Run("http://localhost:5000");
 
 //"    "configuration": {
 //        "opaque_params": [],

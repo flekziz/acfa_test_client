@@ -23,6 +23,11 @@ namespace src.app.module.Repositories
             });
         }
 
+        public IEnumerable<DbConfigurationModel> GetAllConfigurations()
+        {
+            return _configurations;
+        }
+
         public DbConfigurationModel GetConfiguration(string uid)
         {
             return _configurations.FirstOrDefault(c => c.Uid == uid);
