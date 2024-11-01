@@ -6,6 +6,6 @@ namespace src.app.module.Models
     {
         public string Uid { get; set; }
         public string Type { get; set; }
-        public Dictionary<string, string> Properties { get; set; }
+        public Dictionary<string, object> Properties { get; set; }
     }
 }

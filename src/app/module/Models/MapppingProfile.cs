@@ -4,6 +4,7 @@ using src.app.module.Models;
 
 namespace src.app.module.Mapping
 {
+    //парсинг данных для клиента
     public class MappingProfile : Profile
     {
         public MappingProfile()
