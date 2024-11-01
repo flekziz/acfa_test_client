@@ -3,6 +3,8 @@ using src.app.module.Models;
 using src.app.module.Repositories;
 using AutoMapper;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace src.app.module.Controllers
 {
@@ -20,17 +22,17 @@ namespace src.app.module.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<OutputConfigurationModel>> GetAllConfigurations()
+        public async Task<ActionResult<IEnumerable<OutputConfigurationModel>>> GetConfigurations(CancellationToken cancellationToken)
         {
-            var configurations = _configurationRepository.GetAllConfigurations();
+            var configurations = await _configurationRepository.GetConfigurationsAsync(cancellationToken);
             var outputModels = _mapper.Map<IEnumerable<OutputConfigurationModel>>(configurations);
             return Ok(outputModels);
         }
 
         [HttpGet("{uid}")]
-        public ActionResult<OutputConfigurationModel> GetConfiguration(string uid)
+        public async Task<ActionResult<OutputConfigurationModel>> GetConfiguration(string uid, CancellationToken cancellationToken)
         {
-            var dbModel = _configurationRepository.GetConfiguration(uid);
+            var dbModel = await _configurationRepository.GetConfigurationAsync(uid, cancellationToken);
 
             if (dbModel == null)
             {
@@ -42,14 +44,14 @@ namespace src.app.module.Controllers
         }
 
         [HttpPost("{uid}")]
-        public IActionResult SaveConfiguration(string uid, [FromBody] DbConfigurationModel model)
+        public async Task<IActionResult> SaveConfiguration(string uid, DbConfigurationModel model, CancellationToken cancellationToken)
         {
             if (model == null || model.Uid != uid)
             {
                 return BadRequest("Invalid configuration data.");
             }
 
-            _configurationRepository.SaveConfiguration(model);
+            await _configurationRepository.SaveConfigurationAsync(model, cancellationToken);
             return Ok();
         }
     }

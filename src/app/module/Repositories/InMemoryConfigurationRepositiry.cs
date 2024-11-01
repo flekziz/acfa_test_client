@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using src.app.module.Repositories;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace src.app.module.Repositories
 {
@@ -22,20 +24,27 @@ namespace src.app.module.Repositories
                 }
             });
         }
-
-        public IEnumerable<DbConfigurationModel> GetAllConfigurations()
+        //добавить task async и cancellation token
+        public Task<DbConfigurationModel[]> GetConfigurationsAsync(CancellationToken cancellationToken)
         {
-            return _configurations;
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(_configurations.ToArray());
         }
 
-        public DbConfigurationModel GetConfiguration(string uid)
+        public Task<DbConfigurationModel> GetConfigurationAsync(string uid, CancellationToken cancellationToken)
         {
-            return _configurations.FirstOrDefault(c => c.Uid == uid);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var configuration = _configurations.FirstOrDefault(x => x.Uid == uid);
+            return Task.FromResult(configuration);
         }
 
-        public void SaveConfiguration(DbConfigurationModel configuration)
+        public Task SaveConfigurationAsync(DbConfigurationModel configuration, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             _configurations.Add(configuration);
+            return Task.CompletedTask;
         }
     }
 }
