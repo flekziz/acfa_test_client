@@ -1,4 +1,4 @@
-﻿using repository.module.Models.Output;
+﻿using repository.module.Models;
 using repository.module.Interfaces;
 using repository.module.Models.Internal;
 using AutoMapper;

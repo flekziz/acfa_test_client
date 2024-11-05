@@ -1,4 +1,4 @@
-﻿using repository.module.Models.Output;
+﻿using repository.module.Models;
 
 namespace repository.module.Interfaces
 {

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using repository.module.Interfaces;
 using repository.module.Models.Internal;
-using repository.module.Models.Output;
+using repository.module.Models;
 
 namespace repository.module.Implementations
 {
