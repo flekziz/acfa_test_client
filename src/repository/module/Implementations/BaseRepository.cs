@@ -9,14 +9,12 @@ namespace repository.module.Implementations
 {
     internal abstract class BaseRepository<TEntityOut, TEntityIn> : IRepository<TEntityOut> where TEntityIn : class
     {
-        protected readonly AppDbContext _context;
-        protected readonly DbSet<TEntityIn> _dbSet;
+        protected readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         protected readonly IMapper _mapper;
 
-        protected BaseRepository(AppDbContext context, IMapper mapper)
+        protected BaseRepository(IDbContextFactory<AppDbContext> dbContextFactory, IMapper mapper)
         {
-            _context = context;
-            _dbSet = context.Set<TEntityIn>();
+            _dbContextFactory = dbContextFactory;
             _mapper = mapper;
         }
 
@@ -25,32 +23,41 @@ namespace repository.module.Implementations
 
         public async Task AddAsync(TEntityOut item, CancellationToken cancellationToken = default)
         {
+            using var context = _dbContextFactory.CreateDbContext();
             var internalItem = GetInternalModel(item);
-            await _context.AddAsync(internalItem, cancellationToken);
+            await context.AddAsync(internalItem, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task AddRangeAsync(CancellationToken cancellationToken = default, params TEntityOut[] items)
+        {
+            using var context = _dbContextFactory.CreateDbContext();
+            var internalItems = items.Select(item => GetInternalModel(item)).ToArray();
+            await context.AddRangeAsync(internalItems, cancellationToken: cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<TEntityOut[]> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var internalItems = await _dbSet.ToArrayAsync(cancellationToken);
+            using var context = _dbContextFactory.CreateDbContext();
+            var internalItems = await context.Set<TEntityIn>().ToArrayAsync(cancellationToken);
             var outputItems = internalItems.Select(item => GetOutputModel(item)).ToArray();
             return outputItems;
         }
 
         public async Task<TEntityOut> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            var internalItem = await _dbSet.FindAsync(id, cancellationToken);
+            using var context = _dbContextFactory.CreateDbContext();
+            var internalItem = await context.FindAsync<TEntityIn>(id, cancellationToken);
             return GetOutputModel(internalItem);
         }
 
-        public void Remove(TEntityOut item)
+        public async Task RemoveAsync(TEntityOut item, CancellationToken cancellationToken = default)
         {
+            using var context = _dbContextFactory.CreateDbContext();
             var internalItem = GetInternalModel(item);
-            _dbSet.Remove(internalItem);
-        }
-
-        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            await _context.SaveChangesAsync(cancellationToken);
+            context.Remove(internalItem);
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

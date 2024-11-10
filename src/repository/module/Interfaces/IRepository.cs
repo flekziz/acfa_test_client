@@ -8,7 +8,7 @@ namespace repository.module.Interfaces
         Task<TEntity[]> GetAllAsync(CancellationToken cancellationToken = default);
         Task<TEntity> GetByIdAsync(string id, CancellationToken cancellationToken = default);
         Task AddAsync(TEntity item, CancellationToken cancellationToken = default);
-        void Remove(TEntity item);
-        Task SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task AddRangeAsync(CancellationToken cancellationToken = default, params TEntity[] items);
+        Task RemoveAsync(TEntity item, CancellationToken cancellationToken = default);
     }
 }

@@ -2,12 +2,14 @@
 using repository.module.Interfaces;
 using repository.module.Models.Internal;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace repository.module.Implementations
 {
     internal class EventRepository : BaseRepository<Event, EventInternal>, IEventRepository
     {
-        public EventRepository(AppDbContext context, IMapper mapper) : base(context, mapper) { }
+        public EventRepository(IDbContextFactory<AppDbContext> dbContextFactory, IMapper mapper) 
+            : base(dbContextFactory, mapper) { }
 
         private protected override EventInternal GetInternalModel(Event item)
         {

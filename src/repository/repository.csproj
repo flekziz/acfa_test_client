@@ -6,7 +6,4 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="module\Profiles\" />
-  </ItemGroup>
 </Project>
