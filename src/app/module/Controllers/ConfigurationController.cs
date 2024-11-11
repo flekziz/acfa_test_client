@@ -43,18 +43,20 @@ namespace src.app.module.Controllers
             return Ok(outputModel);
         }
 
-        [HttpPost("{uid}")]
-        public async Task<IActionResult> SaveConfiguration(string uid, Configuration model, CancellationToken cancellationToken)
-        {
-            if (model.Uid != uid)
-            {
-                return BadRequest("Invalid configuration data.");
-            }
+        //нет доступа к internal классу для маппинга
 
-            var internalModel = _mapper.Map<Configuration>(model);
-            await _configurationRepository.AddAsync(internalModel, cancellationToken);
-            return Ok();
-        }
+        //[HttpPost("{uid}")]
+        //public async Task<IActionResult> SaveConfiguration(string uid, Configuration model, CancellationToken cancellationToken)
+        //{
+        //    if (model.Uid != uid)
+        //    {
+        //        return BadRequest("Invalid configuration data.");
+        //    }
+
+        //    var internalModel = _mapper.Map<ConfigurationInternal>(model);
+        //    await _configurationRepository.AddAsync(internalModel, cancellationToken);
+        //    return Ok();
+        //}
 
         //[HttpPost("bulk")]
         //public async Task<IActionResult> SaveConfigurations(string uid, Configuration[] models, CancellationToken cancellationToken)
@@ -64,8 +66,23 @@ namespace src.app.module.Controllers
         //        return BadRequest("Invalid configuration data.");
         //    }
 
-        //    await _configurationRepository.AddRangeAsync(models, cancellationToken);
+        //    var internalModels = _mapper.Map<ConfigurationInternal[]>(models);
+        //    await _configurationRepository.AddRangeAsync(cancellationToken, internalModels);
         //    return Ok();
         //}
+
+        [HttpDelete("{uid}")]
+        public async Task<IActionResult> DeleteConfiguration(string uid, CancellationToken cancellationToken)
+        {
+            var configuration = await _configurationRepository.GetByIdAsync(uid, cancellationToken);
+
+            if(configuration == null)
+            {
+                return NotFound();
+            }
+
+            await _configurationRepository.RemoveAsync(configuration);
+            return Ok();
+        }
     }
 }
