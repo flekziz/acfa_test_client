@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using src.app.module.Models;
-using src.app.module.Repositories;
+using repository.module.Interfaces;
+using repository.module.Models.Internal;
+using repository.module.Implementations;
+using repository.module.Profiles;
+using repository.module.Models;
 using AutoMapper;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace src.app.module.Controllers
 {
@@ -22,37 +26,46 @@ namespace src.app.module.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OutputConfigurationModel>>> GetConfigurations(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<Configuration>>> GetConfigurations(CancellationToken cancellationToken)
         {
-            var configurations = await _configurationRepository.GetConfigurationsAsync(cancellationToken);
-            var outputModels = _mapper.Map<IEnumerable<OutputConfigurationModel>>(configurations);
+            var configurations = await _configurationRepository.GetAllAsync(cancellationToken);
+
+            var outputModels = _mapper.Map<IEnumerable<Configuration>>(configurations);
             return Ok(outputModels);
         }
 
         [HttpGet("{uid}")]
-        public async Task<ActionResult<OutputConfigurationModel>> GetConfiguration(string uid, CancellationToken cancellationToken)
+        public async Task<ActionResult<Configuration>> GetConfiguration(string uid, CancellationToken cancellationToken)
         {
-            var dbModel = await _configurationRepository.GetConfigurationAsync(uid, cancellationToken);
+            var dbModel = await _configurationRepository.GetByIdAsync(uid, cancellationToken);
 
-            if (dbModel == null)
-            {
-                return NotFound();
-            }
-
-            var outputModel = _mapper.Map<OutputConfigurationModel>(dbModel);
+            var outputModel = _mapper.Map<Configuration>(dbModel);
             return Ok(outputModel);
         }
 
         [HttpPost("{uid}")]
-        public async Task<IActionResult> SaveConfiguration(string uid, DbConfigurationModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> SaveConfiguration(string uid, Configuration model, CancellationToken cancellationToken)
         {
-            if (model == null || model.Uid != uid)
+            if (model.Uid != uid)
             {
                 return BadRequest("Invalid configuration data.");
             }
 
-            await _configurationRepository.SaveConfigurationAsync(model, cancellationToken);
+            var internalModel = _mapper.Map<Configuration>(model);
+            await _configurationRepository.AddAsync(internalModel, cancellationToken);
             return Ok();
         }
+
+        //[HttpPost("bulk")]
+        //public async Task<IActionResult> SaveConfigurations(string uid, Configuration[] models, CancellationToken cancellationToken)
+        //{
+        //    if (models == null || models.Length == 0)
+        //    {
+        //        return BadRequest("Invalid configuration data.");
+        //    }
+
+        //    await _configurationRepository.AddRangeAsync(models, cancellationToken);
+        //    return Ok();
+        //}
     }
 }
