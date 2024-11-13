@@ -5,6 +5,7 @@ using Grpc.Net.Client;
 using repository.module.Models.Internal;
 using repository.module.Implementations;
 using repository.module.Profiles;
+using repository.module;
 using System;
 using repository.module.Interfaces;
 using repository.module.Models;
@@ -12,12 +13,10 @@ using repository.module.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//экстеншн метод для регистрации
-//builder.Services.AddConfigurationServices();
-
+var configuration = builder.Configuration;
 builder.Services.AddControllers();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddRepository(configuration);
 
 //регистрация grpc клиента
 //..//
