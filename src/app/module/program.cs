@@ -1,40 +1,29 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using src.app.module.Repositories;
-using AutoMapper;
-using src.app.module.Mapping;
+using src.app.module.Services.BackgroungTasks;
+using Grpc.Net.Client;
+using repository.module.Models.Internal;
+using repository.module.Implementations;
+using repository.module.Profiles;
+using System;
+using repository.module.Interfaces;
+using repository.module.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
+//экстеншн метод для регистрации
+//builder.Services.AddConfigurationServices();
+
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IConfigurationRepository, InMemoryConfigurationRepository>();
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
+//регистрация grpc клиента
+//..//
+
+builder.Services.AddHostedService<GrpcStreamWorker>();
 var app = builder.Build();
 
 app.MapControllers();
 app.Run("http://localhost:5000");
-
-//"    "configuration": {
-//        "opaque_params": [],
-//        "properties": [
-//            {
-//                "id": "ip",
-//                "value_string": "10.0.11.217"
-//            },
-//            {
-//                "id": "login",
-//                "value_string": "Administrator"
-//            },
-//            {
-//                "id": "password",
-//                "value_string": "Isb2024"
-//            },
-//            {
-//                "id": "db_password",
-//                "value_string": "12345"
-//            }
-//        ],
-//        "traits": [],
-//        "type": "SPHINX_SRV",
-//        "uid": "ACFA.1"
-//    }"
