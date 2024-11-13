@@ -2,12 +2,14 @@
 using repository.module.Interfaces;
 using repository.module.Models.Internal;
 using repository.module.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace repository.module.Implementations
 {
     internal class ConfigurationRepository : BaseRepository<Configuration, ConfigurationInternal>, IConfigurationRepository
     {
-        public ConfigurationRepository(AppDbContext context, IMapper mapper) : base(context, mapper) { }
+        public ConfigurationRepository(IDbContextFactory<AppDbContext> dbContextFactory, IMapper mapper) 
+            : base(dbContextFactory, mapper) { }
 
         private protected override ConfigurationInternal GetInternalModel(Configuration item)
         {
