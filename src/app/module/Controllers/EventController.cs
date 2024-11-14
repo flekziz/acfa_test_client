@@ -4,6 +4,7 @@ using repository.module.Models;
 using AutoMapper;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace src.app.module.Controllers
 {
@@ -13,15 +14,10 @@ namespace src.app.module.Controllers
     {
         private readonly IEventRepository _eventRepository;
 
-        public EventController(IEventRepository eventRepository, IMapper mapper)
-            : base(eventRepository, mapper)
+        public EventController(IEventRepository eventRepository, IMapper mapper, ILogger logger)
+            : base(eventRepository, mapper, logger)
         {
             _eventRepository = eventRepository;
-        }
-
-        protected override bool IsValidUid(Event model, string uid)
-        {
-            return model.Uid == uid;
         }
     }
 }
