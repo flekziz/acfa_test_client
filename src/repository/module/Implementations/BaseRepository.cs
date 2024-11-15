@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -20,6 +21,7 @@ namespace repository.module.Implementations
 
         private protected abstract TEntityIn GetInternalModel(TEntityOut item);
         private protected abstract TEntityOut GetOutputModel(TEntityIn item);
+        private protected abstract string GetSortKey(TEntityIn item);
 
         public async Task AddAsync(TEntityOut item, CancellationToken cancellationToken = default)
         {
@@ -43,6 +45,19 @@ namespace repository.module.Implementations
             var internalItems = await context.Set<TEntityIn>().ToArrayAsync(cancellationToken);
             var outputItems = internalItems.Select(item => GetOutputModel(item)).ToArray();
             return outputItems;
+        }
+
+        public async Task<TEntityOut[]> GetAllAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+        {
+            using var context = _dbContextFactory.CreateDbContext();
+            var internalItemsPage = await context.Set<TEntityIn>()
+                .OrderBy(i => GetSortKey(i))
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToArrayAsync();
+
+            var outputItemsPage = internalItemsPage.Select(item => GetOutputModel(item)).ToArray();
+            return outputItemsPage;
         }
 
         public async Task<TEntityOut> GetByIdAsync(string id, CancellationToken cancellationToken = default)
