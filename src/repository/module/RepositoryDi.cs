@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using repository.module.Implementations;
 using repository.module.Interfaces;
-using repository.module.Profiles;
 
 namespace repository.module
 {
@@ -11,20 +10,10 @@ namespace repository.module
     {
         public static IServiceCollection AddRepository(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AutoMapperConfigure()
+            services.AddAutoMapper(typeof(RepositoryDi))
                 .DbConfigure(configuration)
                 .AddScoped<IConfigurationRepository, ConfigurationRepository>()
                 .AddScoped<IEventRepository, EventRepository>();
-
-            return services;
-        }
-
-        private static IServiceCollection AutoMapperConfigure(this IServiceCollection services)
-        {
-            services.AddAutoMapper(typeof(ConfigurationMappingProfile),
-                typeof(EventDataMappingProfile),
-                typeof(EventMappingProfile),
-                typeof(PropertyMappingProfile));
 
             return services;
         }
