@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace src.app.module.Services.BackgroungTasks
+namespace app.module.Services.BackgroungTasks
 {
     public class GrpcStreamWorker : BackgroundService
     {

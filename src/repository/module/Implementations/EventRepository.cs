@@ -20,5 +20,10 @@ namespace repository.module.Implementations
         {
             return _mapper.Map<EventInternal, Event>(item);
         }
+
+        private protected override string GetSortKey(EventInternal item)
+        {
+            return item.Uid;
+        }
     }
 }
