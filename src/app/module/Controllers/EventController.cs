@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using repository.module.Interfaces;
 using repository.module.Models;
+using app.module.Models;
 using AutoMapper;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace src.app.module.Controllers
+namespace app.module.Controllers
 {
     [ApiController]
     [Route("api/events")]
-    public class EventController : BaseController<Event>
+    public class EventController : BaseController<Event, EventDto>
     {
         private readonly IEventRepository _eventRepository;
 

@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using repository.module.Interfaces;
 using repository.module.Models;
+using app.module.Models;
 using AutoMapper;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace src.app.module.Controllers
+namespace app.module.Controllers
 {
     [ApiController]
     [Route("api/configurations")]
-    public class ConfigurationController : BaseController<Configuration>
+    public class ConfigurationController : BaseController<Configuration, ConfigurationDto>
     {
         private readonly IConfigurationRepository _configurationRepository;
 

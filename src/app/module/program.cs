@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using src.app.module.Services.BackgroungTasks;
+using app.module.Services.BackgroungTasks;
 using Grpc.Net.Client;
 using repository.module.Models.Internal;
 using repository.module.Implementations;
@@ -14,12 +14,14 @@ using repository.module.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
+
 builder.Services.AddControllers();
 
 builder.Services.AddRepository(configuration);
 
-//регистрация grpc клиента
-//..//
+builder.Services.AddAutoMapper(typeof(ConfigurationMappingProfile).Assembly);
+builder.Services.AddLogging();
+
 
 builder.Services.AddHostedService<GrpcStreamWorker>();
 var app = builder.Build();

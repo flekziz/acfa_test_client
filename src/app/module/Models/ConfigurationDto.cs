@@ -6,12 +6,12 @@ namespace app.module.Models
     public class ConfigurationDto
     {
         [Required]
-        internal string Uid { get; set; }
+        public string Uid { get; set; }
         [Required]
-        internal string DisplayName { get; set; }
+        public string DisplayName { get; set; }
         [Required]
-        internal string InternalType { get; set; }
-        internal IEnumerable<PropertyDto> Properties { get; set; }
-        internal IEnumerable<ConfigurationDto> Configurations { get; set; }
+        public string InternalType { get; set; }
+        public IEnumerable<PropertyDto> Properties { get; set; }
+        public IEnumerable<ConfigurationDto> Configurations { get; set; }
     }
 }
