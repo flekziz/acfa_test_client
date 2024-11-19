@@ -15,7 +15,7 @@ namespace app.module.Controllers
     {
         private readonly IConfigurationRepository _configurationRepository;
 
-        public ConfigurationController(IConfigurationRepository configurationRepository, IMapper mapper, ILogger logger)
+        public ConfigurationController(IConfigurationRepository configurationRepository, IMapper mapper, ILogger<ConfigurationController> logger)
             : base(configurationRepository, mapper, logger)
         {
             _configurationRepository = configurationRepository;

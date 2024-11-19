@@ -15,7 +15,7 @@ namespace app.module.Controllers
     {
         private readonly IEventRepository _eventRepository;
 
-        public EventController(IEventRepository eventRepository, IMapper mapper, ILogger logger)
+        public EventController(IEventRepository eventRepository, IMapper mapper, ILogger<EventController> logger)
             : base(eventRepository, mapper, logger)
         {
             _eventRepository = eventRepository;

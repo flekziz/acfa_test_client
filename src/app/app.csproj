@@ -1,2 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <Folder Include="module\Services\BackgroundTasks\" />
+    <Folder Include="module\Models\" />
+    <Folder Include="src\repository\Migrations\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Grpc.Net.Client" Version="2.66.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
+    <PackageReference Include="repository" Version="0.0.0" />
+  </ItemGroup>
 </Project>
