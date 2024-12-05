@@ -20,7 +20,7 @@ namespace repository.module.Implementations
 
         private protected abstract TEntityIn GetInternalModel(TEntityOut item);
         private protected abstract TEntityOut GetOutputModel(TEntityIn item);
-        private protected abstract string GetSortKey(TEntityIn item);
+        private protected abstract string GetKey(TEntityIn item);
 
         public async Task AddAsync(TEntityOut item, CancellationToken cancellationToken = default)
         {
@@ -50,7 +50,7 @@ namespace repository.module.Implementations
         {
             using var context = _dbContextFactory.CreateDbContext();
             var internalItemsPage = await context.Set<TEntityIn>()
-                .OrderBy(i => GetSortKey(i))
+                .OrderBy(i => GetKey(i))
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToArrayAsync();
@@ -70,8 +70,12 @@ namespace repository.module.Implementations
         {
             using var context = _dbContextFactory.CreateDbContext();
             var internalItem = GetInternalModel(item);
-            context.Remove(internalItem);
-            await context.SaveChangesAsync(cancellationToken);
+            internalItem = await context.FindAsync<TEntityIn>(GetKey(internalItem));
+            if (internalItem is not null)
+            {
+                context.Remove(internalItem);
+                await context.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 }
