@@ -21,7 +21,7 @@ namespace repository.module.Implementations
             return _mapper.Map<ConfigurationInternal, Configuration>(item);
         }
 
-        private protected override string GetSortKey(ConfigurationInternal item)
+        private protected override string GetKey(ConfigurationInternal item)
         {
             return item.Uid;
         }
