@@ -16,7 +16,10 @@ namespace repository.module.Configs
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.OwnsMany(c => c.Properties, p => p.ToJson());
+            builder.OwnsMany(c => c.Properties, p => {
+                p.ToJson();
+                p.OwnsMany(y => y.Properties);
+            });
         }
     }
 }
