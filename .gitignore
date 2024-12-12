@@ -29,3 +29,5 @@ Release
 axacfa.icons_master
 *.pubxml
 *.pubxml.user
+
+git_ignore_*
